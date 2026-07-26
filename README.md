@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Autismoware Web Radar</title>
-    <!-- Include PeerJS for zero-IP serverless P2P room streaming -->
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap');
         
@@ -34,22 +32,22 @@
             color: var(--text-main);
             font-family: 'Outfit', sans-serif;
             overflow-x: hidden;
-            overflow-y: auto !important; /* Enable page scrolling everywhere */
+            overflow-y: auto !important;
         }
 
-        /* Main Container */
+        /* Page Container */
         #app-container {
             width: 100%;
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 18px;
             align-items: center;
         }
 
-        /* Header Bar */
+        /* Top Brand Header */
         .brand-header {
             width: 100%;
             display: flex;
@@ -58,12 +56,12 @@
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
-            padding: 12px 20px;
+            padding: 14px 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         h1 {
-            font-size: 20px;
+            font-size: 22px;
             font-weight: 800;
             color: var(--accent-color);
             text-shadow: 0 0 16px var(--accent-glow);
@@ -82,67 +80,38 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Radar Viewport Section - PROMINENT AT TOP */
+        /* RADAR VIEWPORT SECTION - FRONT & CENTER AT THE TOP */
         #viewport {
             width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            position: relative;
-            padding: 10px 0;
+            padding: 8px 0;
         }
 
-        canvas {
+        #radarCanvas {
             background: #0b0d14;
-            border: 2px solid var(--border-color);
-            border-radius: 28px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(204, 255, 0, 0.1);
-            max-width: 100%;
+            border: 2.5px solid var(--border-color);
+            border-radius: 32px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(204, 255, 0, 0.12);
+            width: 600px;
+            max-width: 95vw;
             height: auto;
+            aspect-ratio: 1 / 1;
             display: block;
+            margin: 0 auto;
         }
 
-        /* Content Layout: Radar + Controls side by side on desktop, stacked on mobile */
-        .main-layout {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        @media (min-width: 900px) {
-            .main-layout {
-                flex-direction: row-reverse;
-                align-items: flex-start;
-            }
-
-            #viewport {
-                flex: 1;
-            }
-
-            #controls-panel {
-                width: 360px;
-                min-width: 360px;
-            }
-        }
-
-        /* Controls Panel */
-        #controls-panel {
-            width: 100%;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        /* Lobby Info Box */
+        /* Lobby Info & Connection Card */
         .lobby-box {
+            width: 100%;
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
             border-radius: 16px;
             padding: 18px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
@@ -161,7 +130,7 @@
         }
 
         .lobby-value {
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 800;
             color: #ffffff;
             letter-spacing: 2px;
@@ -173,7 +142,7 @@
             color: var(--accent-color);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            padding: 8px 14px;
+            padding: 8px 16px;
             font-size: 11px;
             font-weight: 700;
             cursor: pointer;
@@ -190,13 +159,13 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-dim);
         }
 
         .status-dot {
-            width: 9px;
-            height: 9px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: #ff3333;
             box-shadow: 0 0 10px #ff3333;
@@ -208,20 +177,21 @@
             box-shadow: 0 0 12px var(--accent-color);
         }
 
-        /* Controls Card */
+        /* Controls Panel */
         .controls-group {
+            width: 100%;
             background: var(--panel-bg);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 16px;
             padding: 18px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
         .group-title {
-            font-size: 11px;
+            font-size: 12px;
             font-weight: 700;
             color: var(--accent-color);
             text-transform: uppercase;
@@ -247,7 +217,7 @@
         .switch {
             position: relative;
             display: inline-block;
-            width: 42px;
+            width: 44px;
             height: 22px;
         }
 
@@ -272,7 +242,7 @@
             content: "";
             height: 14px;
             width: 14px;
-            left: 3px;
+            left: 4px;
             bottom: 3px;
             background-color: #ffffff;
             transition: .3s ease;
@@ -289,7 +259,7 @@
             background-color: #0c0d12;
         }
 
-        /* Sliders */
+        /* Range Sliders */
         .range-container {
             display: flex;
             flex-direction: column;
@@ -322,7 +292,7 @@
 </head>
 <body>
     <div id="app-container">
-        <!-- HEADER -->
+        <!-- TOP BRAND HEADER -->
         <div class="brand-header">
             <div>
                 <h1>Autismoware</h1>
@@ -331,128 +301,126 @@
             <span class="version-tag">v1.3.0</span>
         </div>
 
-        <div class="main-layout">
-            <!-- RADAR CANVAS VIEWPORT -->
-            <div id="viewport">
-                <canvas id="radarCanvas" width="600" height="600"></canvas>
+        <!-- WEBRADAR CANVAS - ALWAYS VISIBLE AT TOP -->
+        <div id="viewport">
+            <canvas id="radarCanvas" width="600" height="600"></canvas>
+        </div>
+
+        <!-- LOBBY CODE & STATUS CARD -->
+        <div class="lobby-box">
+            <div class="lobby-row">
+                <span class="lobby-label">Lobby Code</span>
+                <button class="copy-btn" id="copy-btn">COPY SHARE LINK</button>
+            </div>
+            <span id="lobby-id" class="lobby-value">LOADING</span>
+
+            <div class="status-indicator">
+                <div id="status-dot" class="status-dot"></div>
+                <span id="status-text">Connecting to Game Client...</span>
+            </div>
+        </div>
+
+        <!-- CONTROLS & VISUAL TOGGLES -->
+        <div class="controls-group">
+            <span class="group-title">Radar Visuals</span>
+            
+            <label class="checkbox-container">
+                <span class="checkbox-label">Terrain Map Overview</span>
+                <span class="switch">
+                    <input type="checkbox" id="show-terrain" checked>
+                    <span class="slider"></span>
+                </span>
+            </label>
+
+            <label class="checkbox-container">
+                <span class="checkbox-label">Compass (N, S, E, W)</span>
+                <span class="switch">
+                    <input type="checkbox" id="show-compass" checked>
+                    <span class="slider"></span>
+                </span>
+            </label>
+
+            <label class="checkbox-container">
+                <span class="checkbox-label">Distance Rings</span>
+                <span class="switch">
+                    <input type="checkbox" id="show-rings" checked>
+                    <span class="slider"></span>
+                </span>
+            </label>
+
+            <label class="checkbox-container">
+                <span class="checkbox-label">FOV View Cone</span>
+                <span class="switch">
+                    <input type="checkbox" id="show-fov" checked>
+                    <span class="slider"></span>
+                </span>
+            </label>
+
+            <label class="checkbox-container">
+                <span class="checkbox-label">Local Player</span>
+                <span class="switch">
+                    <input type="checkbox" id="show-local" checked>
+                    <span class="slider"></span>
+                </span>
+            </label>
+
+            <label class="checkbox-container">
+                <span class="checkbox-label">Friends / Teammates</span>
+                <span class="switch">
+                    <input type="checkbox" id="show-friends" checked>
+                    <span class="slider"></span>
+                </span>
+            </label>
+
+            <label class="checkbox-container">
+                <span class="checkbox-label">Enemies</span>
+                <span class="switch">
+                    <input type="checkbox" id="show-enemies" checked>
+                    <span class="slider"></span>
+                </span>
+            </label>
+
+            <label class="checkbox-container">
+                <span class="checkbox-label">Player Names & Tags</span>
+                <span class="switch">
+                    <input type="checkbox" id="show-names" checked>
+                    <span class="slider"></span>
+                </span>
+            </label>
+
+            <label class="checkbox-container">
+                <span class="checkbox-label">Box Shape Container</span>
+                <span class="switch">
+                    <input type="checkbox" id="shape-box">
+                    <span class="slider"></span>
+                </span>
+            </label>
+        </div>
+
+        <!-- CONFIGURATION SLIDERS -->
+        <div class="controls-group">
+            <span class="group-title">Configuration</span>
+            
+            <div class="range-container">
+                <div class="range-header">
+                    <span>Radar Zoom / Scale</span>
+                    <span id="scale-val" class="range-value">1.0x</span>
+                </div>
+                <input type="range" id="scale-slider" class="range-input" min="0.1" max="5.0" step="0.1" value="1.0">
             </div>
 
-            <!-- CONTROLS & SETTINGS PANEL -->
-            <div id="controls-panel">
-                <div class="lobby-box">
-                    <div class="lobby-row">
-                        <span class="lobby-label">Lobby Code</span>
-                        <button class="copy-btn" id="copy-btn">COPY LINK</button>
-                    </div>
-                    <span id="lobby-id" class="lobby-value">LOADING</span>
-
-                    <div class="status-indicator">
-                        <div id="status-dot" class="status-dot"></div>
-                        <span id="status-text">Connecting...</span>
-                    </div>
+            <div class="range-container">
+                <div class="range-header">
+                    <span>Terrain Opacity</span>
+                    <span id="opacity-val" class="range-value">100%</span>
                 </div>
-
-                <div class="controls-group">
-                    <span class="group-title">Radar Visuals</span>
-                    
-                    <label class="checkbox-container">
-                        <span class="checkbox-label">Terrain Map Overview</span>
-                        <span class="switch">
-                            <input type="checkbox" id="show-terrain" checked>
-                            <span class="slider"></span>
-                        </span>
-                    </label>
-
-                    <label class="checkbox-container">
-                        <span class="checkbox-label">Compass (N,S,E,W)</span>
-                        <span class="switch">
-                            <input type="checkbox" id="show-compass" checked>
-                            <span class="slider"></span>
-                        </span>
-                    </label>
-
-                    <label class="checkbox-container">
-                        <span class="checkbox-label">Distance Rings</span>
-                        <span class="switch">
-                            <input type="checkbox" id="show-rings" checked>
-                            <span class="slider"></span>
-                        </span>
-                    </label>
-
-                    <label class="checkbox-container">
-                        <span class="checkbox-label">FOV View Cone</span>
-                        <span class="switch">
-                            <input type="checkbox" id="show-fov" checked>
-                            <span class="slider"></span>
-                        </span>
-                    </label>
-
-                    <label class="checkbox-container">
-                        <span class="checkbox-label">Local Player</span>
-                        <span class="switch">
-                            <input type="checkbox" id="show-local" checked>
-                            <span class="slider"></span>
-                        </span>
-                    </label>
-
-                    <label class="checkbox-container">
-                        <span class="checkbox-label">Friends / Teammates</span>
-                        <span class="switch">
-                            <input type="checkbox" id="show-friends" checked>
-                            <span class="slider"></span>
-                        </span>
-                    </label>
-
-                    <label class="checkbox-container">
-                        <span class="checkbox-label">Enemies</span>
-                        <span class="switch">
-                            <input type="checkbox" id="show-enemies" checked>
-                            <span class="slider"></span>
-                        </span>
-                    </label>
-
-                    <label class="checkbox-container">
-                        <span class="checkbox-label">Player Names & Tags</span>
-                        <span class="switch">
-                            <input type="checkbox" id="show-names" checked>
-                            <span class="slider"></span>
-                        </span>
-                    </label>
-
-                    <label class="checkbox-container">
-                        <span class="checkbox-label">Box Shape Container</span>
-                        <span class="switch">
-                            <input type="checkbox" id="shape-box">
-                            <span class="slider"></span>
-                        </span>
-                    </label>
-                </div>
-
-                <div class="controls-group">
-                    <span class="group-title">Configuration</span>
-                    
-                    <div class="range-container">
-                        <div class="range-header">
-                            <span>Radar Zoom / Scale</span>
-                            <span id="scale-val" class="range-value">1.0x</span>
-                        </div>
-                        <input type="range" id="scale-slider" class="range-input" min="0.1" max="5.0" step="0.1" value="1.0">
-                    </div>
-
-                    <div class="range-container">
-                        <div class="range-header">
-                            <span>Terrain Opacity</span>
-                            <span id="opacity-val" class="range-value">100%</span>
-                        </div>
-                        <input type="range" id="opacity-slider" class="range-input" min="0.1" max="1.0" step="0.05" value="1.0">
-                    </div>
-                </div>
+                <input type="range" id="opacity-slider" class="range-input" min="0.1" max="1.0" step="0.05" value="1.0">
             </div>
         </div>
     </div>
 
     <script>
-        // Parse Lobby ID e.g. ?lobby=AF7SRW
+        // Parse Lobby ID e.g. ?lobby=Y4Z2C8
         const urlParams = new URLSearchParams(window.location.search);
         let lobbyId = urlParams.get('lobby') || 'AF7SRW';
         lobbyId = lobbyId.toUpperCase();
@@ -464,11 +432,11 @@
             navigator.clipboard.writeText(shareUrl).then(() => {
                 const btn = document.getElementById('copy-btn');
                 btn.innerText = 'COPIED!';
-                setTimeout(() => btn.innerText = 'COPY LINK', 2000);
+                setTimeout(() => btn.innerText = 'COPY SHARE LINK', 2000);
             });
         });
 
-        // UI Controls elements
+        // UI Control Elements
         const showTerrainToggle = document.getElementById('show-terrain');
         const showCompassToggle = document.getElementById('show-compass');
         const showRingsToggle = document.getElementById('show-rings');
@@ -496,26 +464,11 @@
             opacityValLabel.innerText = Math.round(terrainOpacity * 100) + '%';
         });
 
-        // Setup Responsive Canvas
+        // Setup Canvas Engine (600x600 Native Dimensions)
         const canvas = document.getElementById('radarCanvas');
         const ctx = canvas.getContext('2d');
         const center = { x: 300, y: 300 };
-        let radius = 265;
-
-        function resizeCanvas() {
-            const viewport = document.getElementById('viewport');
-            let availableWidth = viewport.clientWidth || window.innerWidth - 32;
-            let size = Math.min(availableWidth, 650);
-            if (size < 280) size = 280;
-
-            canvas.width = size;
-            canvas.height = size;
-            center.x = canvas.width / 2;
-            center.y = canvas.height / 2;
-            radius = (canvas.width / 2) - 35;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+        const radius = 265;
 
         // Shared Player state & Terrain Map
         let localPlayer = { x: 0, y: 0, z: 0, yaw: 0, name: 'Local' };
@@ -535,80 +488,76 @@
             }
         }
 
-        // Dual Connection Strategy:
-        // 1. PeerJS Cloud P2P Room (Zero IP configuration, works on Phone/4G/5G/GitHub Pages)
-        // 2. Direct Local WS Server (ws://localhost:8080/ws for local PC)
-        let peer = null;
-        let peerConn = null;
-        let wsLocal = null;
+        // Robust WebSocket Receiver Logic
+        let ws = null;
 
-        function initConnections() {
-            setStatus('disconnected', 'Connecting P2P Room...');
-
-            // A. Try Local PC WebSocket Server
-            try {
-                wsLocal = new WebSocket('ws://localhost:8080/ws');
-                wsLocal.onopen = () => setStatus('connected', 'Connected (Local PC)');
-                wsLocal.onmessage = (evt) => handleIncomingPayload(evt.data);
-            } catch(e){}
-
-            // B. Connect to PeerJS Serverless Room using Lobby Code e.g. "AUTISMO_HOST_AF7SRW"
-            try {
-                const peerIdReceiver = `AUTISMO_RCV_${lobbyId}_${Math.floor(Math.random()*1000)}`;
-                const peerIdHost = `AUTISMO_HOST_${lobbyId}`;
-
-                peer = new Peer(peerIdReceiver, { debug: 1 });
-
-                peer.on('open', (id) => {
-                    connectToHost(peerIdHost);
-                });
-
-                peer.on('error', (err) => {
-                    setTimeout(() => connectToHost(peerIdHost), 4000);
-                });
-            } catch(e) {}
+        function getWebSocketUrls() {
+            let hosts = [];
+            if (window.location.host && !window.location.host.includes('github.io')) {
+                hosts.push(`ws://${window.location.host}/ws`);
+            }
+            hosts.push('ws://localhost:8080/ws');
+            hosts.push('ws://localhost:8081/ws');
+            hosts.push('ws://127.0.0.1:8080/ws');
+            return hosts;
         }
 
-        function connectToHost(hostPeerId) {
-            if (!peer) return;
-            peerConn = peer.connect(hostPeerId, { reliable: false });
+        let hostIndex = 0;
+        const wsUrls = getWebSocketUrls();
 
-            peerConn.on('open', () => {
-                setStatus('connected', 'Connected (Cloud Room)');
-            });
+        function connectWebSocket() {
+            if (ws) {
+                try { ws.close(); } catch(e){}
+            }
 
-            peerConn.on('data', (data) => {
-                handleIncomingPayload(data);
-                setStatus('connected', 'Connected (Live)');
-            });
+            const targetUrl = wsUrls[hostIndex % wsUrls.length];
+            setStatus('connecting', `Connecting (${targetUrl})...`);
 
-            peerConn.on('close', () => {
-                setStatus('disconnected', 'Reconnecting...');
-                setTimeout(() => connectToHost(hostPeerId), 3000);
-            });
-        }
-
-        function handleIncomingPayload(raw) {
             try {
-                let msg = (typeof raw === 'string') ? JSON.parse(raw) : raw;
-                if (msg.local) localPlayer = msg.local;
-                if (msg.map) mapBlocks = msg.map;
-                if (msg.players) {
-                    remotePlayers = {};
-                    const now = Date.now();
-                    for (let p of msg.players) {
-                        remotePlayers[p.name] = {
-                            x: p.x, y: p.y, z: p.z, yaw: p.yaw,
-                            isFriend: !!p.isFriend,
-                            lastUpdate: now
-                        };
+                ws = new WebSocket(targetUrl);
+
+                ws.onopen = () => {
+                    setStatus('connected', 'Connected (Live)');
+                };
+
+                ws.onclose = () => {
+                    setStatus('disconnected', 'Reconnecting...');
+                    hostIndex++;
+                    setTimeout(connectWebSocket, 2000);
+                };
+
+                ws.onerror = () => {
+                    setStatus('disconnected', 'Retrying...');
+                };
+
+                ws.onmessage = (event) => {
+                    if (typeof event.data === 'string' && event.data.trim().startsWith('{')) {
+                        try {
+                            let msg = JSON.parse(event.data);
+                            if (msg.local) localPlayer = msg.local;
+                            if (msg.map) mapBlocks = msg.map;
+                            if (msg.players) {
+                                remotePlayers = {};
+                                const now = Date.now();
+                                for (let p of msg.players) {
+                                    remotePlayers[p.name] = {
+                                        x: p.x, y: p.y, z: p.z, yaw: p.yaw,
+                                        isFriend: !!p.isFriend,
+                                        lastUpdate: now
+                                    };
+                                }
+                            }
+                            setStatus('connected', 'Connected (Live)');
+                        } catch(e) {}
                     }
-                }
-                setStatus('connected', 'Connected (Live)');
-            } catch(e) {}
+                };
+            } catch(e) {
+                hostIndex++;
+                setTimeout(connectWebSocket, 3000);
+            }
         }
 
-        initConnections();
+        connectWebSocket();
 
         // Render Frame Loop (Matching In-Game Radar Visuals)
         function drawFrame() {
