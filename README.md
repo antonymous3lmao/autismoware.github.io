@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Autismoware Web Radar</title>
+    <!-- Include PeerJS for zero-IP P2P room streaming -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap');
         
@@ -15,7 +17,7 @@
         }
 
         :root {
-            --bg-color: #0c0d12;
+            --bg-color: #08090d;
             --panel-bg: rgba(15, 18, 26, 0.95);
             --accent-color: #ccff00;
             --accent-glow: rgba(204, 255, 0, 0.35);
@@ -26,7 +28,7 @@
 
         html, body {
             width: 100%;
-            height: 100vh;
+            height: 100%;
             margin: 0;
             padding: 0;
             overflow: hidden;
@@ -35,30 +37,28 @@
             font-family: 'Outfit', sans-serif;
             display: flex;
             flex-direction: row;
-            align-items: stretch;
         }
 
         /* Fixed Left Glassmorphism Sidebar */
         #sidebar {
-            width: 350px;
-            min-width: 350px;
-            max-width: 350px;
+            width: 320px;
+            flex: 0 0 320px;
             height: 100vh;
             background: var(--panel-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-right: 1px solid var(--border-color);
-            padding: 24px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
             z-index: 100;
             overflow-y: auto;
             box-shadow: 10px 0 35px rgba(0, 0, 0, 0.7);
         }
 
         #sidebar::-webkit-scrollbar {
-            width: 5px;
+            width: 4px;
         }
         #sidebar::-webkit-scrollbar-thumb {
             background: var(--accent-color);
@@ -74,7 +74,7 @@
         }
 
         h1 {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             color: var(--accent-color);
             text-shadow: 0 0 16px var(--accent-glow);
@@ -105,10 +105,10 @@
             background: rgba(255, 255, 255, 0.025);
             border: 1px solid var(--border-color);
             border-radius: 14px;
-            padding: 16px;
+            padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
         .lobby-row {
@@ -126,7 +126,7 @@
         }
 
         .lobby-value {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 800;
             color: #ffffff;
             letter-spacing: 2px;
@@ -149,25 +149,6 @@
             background: var(--accent-color);
             color: #0c0d12;
             box-shadow: 0 0 12px var(--accent-glow);
-        }
-
-        .host-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            margin-top: 4px;
-        }
-
-        .host-input {
-            width: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--accent-color);
-            font-family: monospace;
-            font-size: 12px;
-            padding: 6px 10px;
-            border-radius: 6px;
-            outline: none;
         }
 
         .status-indicator {
@@ -198,14 +179,14 @@
             background: rgba(255, 255, 255, 0.015);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 14px;
-            padding: 16px;
+            padding: 14px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .group-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--accent-color);
             text-transform: uppercase;
@@ -221,7 +202,7 @@
         }
 
         .checkbox-label {
-            font-size: 13px;
+            font-size: 12px;
             color: #d1d5db;
             font-weight: 500;
         }
@@ -229,8 +210,8 @@
         .switch {
             position: relative;
             display: inline-block;
-            width: 42px;
-            height: 22px;
+            width: 38px;
+            height: 20px;
         }
 
         .switch input {
@@ -245,15 +226,15 @@
             top: 0; left: 0; right: 0; bottom: 0;
             background-color: rgba(255, 255, 255, 0.1);
             transition: .3s ease;
-            border-radius: 22px;
+            border-radius: 20px;
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .slider:before {
             position: absolute;
             content: "";
-            height: 14px;
-            width: 14px;
+            height: 12px;
+            width: 12px;
             left: 3px;
             bottom: 3px;
             background-color: #ffffff;
@@ -267,7 +248,7 @@
         }
 
         input:checked + .slider:before {
-            transform: translateX(20px);
+            transform: translateX(18px);
             background-color: #0c0d12;
         }
 
@@ -275,13 +256,13 @@
         .range-container {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .range-header {
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
+            font-size: 12px;
             color: #d1d5db;
         }
 
@@ -303,7 +284,7 @@
 
         /* Right Canvas Viewport */
         #viewport {
-            flex: 1 1 auto;
+            flex: 1;
             height: 100vh;
             display: flex;
             align-items: center;
@@ -334,15 +315,10 @@
 
         <div class="lobby-box">
             <div class="lobby-row">
-                <span class="lobby-label">Active Lobby</span>
+                <span class="lobby-label">Lobby Code</span>
                 <button class="copy-btn" id="copy-btn">COPY LINK</button>
             </div>
             <span id="lobby-id" class="lobby-value">LOADING</span>
-            
-            <div class="host-input-group">
-                <span class="lobby-label">Sender Host IP</span>
-                <input type="text" id="host-input" class="host-input" placeholder="localhost:8080 or IP">
-            </div>
 
             <div class="status-indicator">
                 <div id="status-dot" class="status-dot"></div>
@@ -453,23 +429,15 @@
     </div>
 
     <script>
-        // Parse Lobby ID & Host IP from URL parameters (e.g. ?lobby=LVE4XI&host=192.168.1.15:8080)
+        // Parse Lobby ID e.g. ?lobby=AF7SRW
         const urlParams = new URLSearchParams(window.location.search);
-        let lobbyId = urlParams.get('lobby') || 'AUTISMO';
+        let lobbyId = urlParams.get('lobby') || 'AF7SRW';
         lobbyId = lobbyId.toUpperCase();
         document.getElementById('lobby-id').innerText = lobbyId;
 
-        let customHost = urlParams.get('host') || '';
-        const hostInput = document.getElementById('host-input');
-        if (customHost) {
-            hostInput.value = customHost;
-        } else {
-            hostInput.value = window.location.host || 'localhost:8080';
-        }
-
         // Copy Share Link Button
         document.getElementById('copy-btn').addEventListener('click', () => {
-            const shareUrl = `${window.location.origin}${window.location.pathname}?lobby=${lobbyId}&host=${encodeURIComponent(hostInput.value)}`;
+            const shareUrl = `${window.location.origin}${window.location.pathname}?lobby=${lobbyId}`;
             navigator.clipboard.writeText(shareUrl).then(() => {
                 const btn = document.getElementById('copy-btn');
                 btn.innerText = 'COPIED!';
@@ -528,8 +496,7 @@
         let remotePlayers = {}; // name -> { x, y, z, yaw, isFriend, lastUpdate }
         let mapBlocks = []; // Array of [dx, dz, colorHex]
 
-        // WebSocket Receiver Connection Logic
-        let ws = null;
+        // Status Indicator Helper
         const statusDot = document.getElementById('status-dot');
         const statusText = document.getElementById('status-text');
 
@@ -542,74 +509,83 @@
             }
         }
 
-        function getTargetWebSocketUrl() {
-            let targetHost = hostInput.value.trim();
-            if (!targetHost || targetHost.includes('github.io')) {
-                targetHost = 'localhost:8080';
-            }
-            let proto = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
-            if (targetHost.startsWith('localhost') || targetHost.startsWith('127.0.0.1') || targetHost.startsWith('192.168.')) {
-                proto = 'ws:';
-            }
-            return `${proto}//${targetHost}/ws`;
-        }
+        // Dual Connection Strategy:
+        // 1. PeerJS Cloud P2P Room (Zero IP configuration, works on Phone/4G/5G/GitHub Pages)
+        // 2. Direct Local WS Server (ws://localhost:8080/ws for local PC)
+        let peer = null;
+        let peerConn = null;
+        let wsLocal = null;
 
-        function connectWebSocket() {
-            if (ws) {
-                try { ws.close(); } catch(e){}
-            }
+        function initConnections() {
+            setStatus('disconnected', 'Connecting P2P Room...');
 
-            const url = getTargetWebSocketUrl();
-            setStatus('disconnected', 'Connecting...');
-
+            // A. Try Local PC WebSocket Server
             try {
-                ws = new WebSocket(url);
+                wsLocal = new WebSocket('ws://localhost:8080/ws');
+                wsLocal.onopen = () => setStatus('connected', 'Connected (Local PC)');
+                wsLocal.onmessage = (evt) => handleIncomingPayload(evt.data);
+            } catch(e){}
 
-                ws.onopen = () => {
-                    setStatus('connected', 'Connected (Live)');
-                };
+            // B. Connect to PeerJS Serverless Room using Lobby Code e.g. "AUTISMO_AF7SRW"
+            try {
+                const peerIdReceiver = `AUTISMO_RCV_${lobbyId}_${Math.floor(Math.random()*1000)}`;
+                const peerIdHost = `AUTISMO_HOST_${lobbyId}`;
 
-                ws.onclose = () => {
-                    setStatus('disconnected', 'Reconnecting...');
-                    setTimeout(connectWebSocket, 3000);
-                };
+                peer = new Peer(peerIdReceiver, {
+                    debug: 1
+                });
 
-                ws.onerror = () => {
-                    setStatus('disconnected', 'Offline / Retrying...');
-                };
+                peer.on('open', (id) => {
+                    // Connect to game host room
+                    connectToHost(peerIdHost);
+                });
 
-                ws.onmessage = (event) => {
-                    if (typeof event.data === 'string' && event.data.trim().startsWith('{')) {
-                        try {
-                            let msg = JSON.parse(event.data);
-                            if (msg.local) {
-                                localPlayer = msg.local;
-                            }
-                            if (msg.map) {
-                                mapBlocks = msg.map;
-                            }
-                            if (msg.players) {
-                                remotePlayers = {};
-                                const now = Date.now();
-                                for (let p of msg.players) {
-                                    remotePlayers[p.name] = {
-                                        x: p.x, y: p.y, z: p.z, yaw: p.yaw,
-                                        isFriend: !!p.isFriend,
-                                        lastUpdate: now
-                                    };
-                                }
-                            }
-                            setStatus('connected', 'Connected (Live)');
-                        } catch(e) {}
-                    }
-                };
-            } catch(e) {
-                setTimeout(connectWebSocket, 4000);
-            }
+                peer.on('error', (err) => {
+                    setTimeout(() => connectToHost(peerIdHost), 4000);
+                });
+            } catch(e) {}
         }
 
-        hostInput.addEventListener('change', connectWebSocket);
-        connectWebSocket();
+        function connectToHost(hostPeerId) {
+            if (!peer) return;
+            peerConn = peer.connect(hostPeerId, { reliable: false });
+
+            peerConn.on('open', () => {
+                setStatus('connected', 'Connected (Cloud Room)');
+            });
+
+            peerConn.on('data', (data) => {
+                handleIncomingPayload(data);
+                setStatus('connected', 'Connected (Live)');
+            });
+
+            peerConn.on('close', () => {
+                setStatus('disconnected', 'Reconnecting...');
+                setTimeout(() => connectToHost(hostPeerId), 3000);
+            });
+        }
+
+        function handleIncomingPayload(raw) {
+            try {
+                let msg = (typeof raw === 'string') ? JSON.parse(raw) : raw;
+                if (msg.local) localPlayer = msg.local;
+                if (msg.map) mapBlocks = msg.map;
+                if (msg.players) {
+                    remotePlayers = {};
+                    const now = Date.now();
+                    for (let p of msg.players) {
+                        remotePlayers[p.name] = {
+                            x: p.x, y: p.y, z: p.z, yaw: p.yaw,
+                            isFriend: !!p.isFriend,
+                            lastUpdate: now
+                        };
+                    }
+                }
+                setStatus('connected', 'Connected (Live)');
+            } catch(e) {}
+        }
+
+        initConnections();
 
         // Render Frame Loop (Matching In-Game Radar Visuals)
         function drawFrame() {
