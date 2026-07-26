@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Autismoware Web Radar</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap');
@@ -16,41 +16,49 @@
 
         :root {
             --bg-color: #0c0d12;
-            --panel-bg: rgba(18, 21, 31, 0.85);
+            --panel-bg: rgba(15, 18, 26, 0.95);
             --accent-color: #ccff00;
             --accent-glow: rgba(204, 255, 0, 0.35);
-            --border-color: rgba(204, 255, 0, 0.15);
+            --border-color: rgba(204, 255, 0, 0.2);
             --text-main: #ffffff;
             --text-dim: #8b92a5;
         }
 
-        body {
+        html, body {
+            width: 100%;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Outfit', sans-serif;
-            overflow: hidden;
             display: flex;
-            height: 100vh;
+            flex-direction: row;
+            align-items: stretch;
         }
 
-        /* Glassmorphism Sidebar */
+        /* Fixed Left Glassmorphism Sidebar */
         #sidebar {
-            width: 340px;
+            width: 350px;
+            min-width: 350px;
+            max-width: 350px;
+            height: 100vh;
             background: var(--panel-bg);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-right: 1px solid var(--border-color);
-            padding: 25px;
+            padding: 24px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            z-index: 10;
-            box-shadow: 15px 0 35px rgba(0, 0, 0, 0.6);
+            gap: 18px;
+            z-index: 100;
             overflow-y: auto;
+            box-shadow: 10px 0 35px rgba(0, 0, 0, 0.7);
         }
 
         #sidebar::-webkit-scrollbar {
-            width: 4px;
+            width: 5px;
         }
         #sidebar::-webkit-scrollbar-thumb {
             background: var(--accent-color);
@@ -61,8 +69,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         h1 {
@@ -92,7 +100,7 @@
             margin-top: 2px;
         }
 
-        /* Lobby Info Box */
+        /* Lobby & Server Config Box */
         .lobby-box {
             background: rgba(255, 255, 255, 0.025);
             border: 1px solid var(--border-color);
@@ -118,7 +126,7 @@
         }
 
         .lobby-value {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
             color: #ffffff;
             letter-spacing: 2px;
@@ -143,12 +151,32 @@
             box-shadow: 0 0 12px var(--accent-glow);
         }
 
+        .host-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .host-input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--accent-color);
+            font-family: monospace;
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            outline: none;
+        }
+
         .status-indicator {
             display: flex;
             align-items: center;
             gap: 8px;
             font-size: 12px;
             color: var(--text-dim);
+            margin-top: 2px;
         }
 
         .status-dot {
@@ -182,7 +210,6 @@
             color: var(--accent-color);
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            margin-bottom: 2px;
         }
 
         /* Custom Switch */
@@ -274,25 +301,28 @@
             cursor: pointer;
         }
 
-        /* Canvas Viewport */
+        /* Right Canvas Viewport */
         #viewport {
-            flex-grow: 1;
+            flex: 1 1 auto;
+            height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             background: radial-gradient(circle at center, #151824 0%, #08090d 100%);
+            overflow: hidden;
         }
 
         canvas {
             background: #0b0d14;
-            border: 1px solid var(--border-color);
-            border-radius: 28px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(204, 255, 0, 0.05);
+            border: 1.5px solid var(--border-color);
+            border-radius: 32px;
+            box-shadow: 0 30px 70px rgba(0, 0, 0, 0.85), 0 0 35px rgba(204, 255, 0, 0.08);
         }
     </style>
 </head>
 <body>
+    <!-- LEFT SIDEBAR -->
     <div id="sidebar">
         <div>
             <div class="brand-header">
@@ -308,6 +338,12 @@
                 <button class="copy-btn" id="copy-btn">COPY LINK</button>
             </div>
             <span id="lobby-id" class="lobby-value">LOADING</span>
+            
+            <div class="host-input-group">
+                <span class="lobby-label">Sender Host IP</span>
+                <input type="text" id="host-input" class="host-input" placeholder="localhost:8080 or IP">
+            </div>
+
             <div class="status-indicator">
                 <div id="status-dot" class="status-dot"></div>
                 <span id="status-text">Connecting...</span>
@@ -318,7 +354,7 @@
             <span class="group-title">Radar Visuals</span>
             
             <label class="checkbox-container">
-                <span class="checkbox-label">Terrain Map</span>
+                <span class="checkbox-label">Terrain Map Overview</span>
                 <span class="switch">
                     <input type="checkbox" id="show-terrain" checked>
                     <span class="slider"></span>
@@ -326,7 +362,7 @@
             </label>
 
             <label class="checkbox-container">
-                <span class="checkbox-label">Compass Overlay (N,S,E,W)</span>
+                <span class="checkbox-label">Compass (N,S,E,W)</span>
                 <span class="switch">
                     <input type="checkbox" id="show-compass" checked>
                     <span class="slider"></span>
@@ -374,7 +410,7 @@
             </label>
 
             <label class="checkbox-container">
-                <span class="checkbox-label">Player Names</span>
+                <span class="checkbox-label">Player Names & Tags</span>
                 <span class="switch">
                     <input type="checkbox" id="show-names" checked>
                     <span class="slider"></span>
@@ -396,9 +432,9 @@
             <div class="range-container">
                 <div class="range-header">
                     <span>Radar Zoom / Scale</span>
-                    <span id="scale-val" class="range-value">1.2x</span>
+                    <span id="scale-val" class="range-value">1.0x</span>
                 </div>
-                <input type="range" id="scale-slider" class="range-input" min="0.2" max="5.0" step="0.1" value="1.2">
+                <input type="range" id="scale-slider" class="range-input" min="0.1" max="5.0" step="0.1" value="1.0">
             </div>
 
             <div class="range-container">
@@ -411,20 +447,30 @@
         </div>
     </div>
 
+    <!-- RIGHT RADAR VIEWPORT -->
     <div id="viewport">
-        <canvas id="radarCanvas" width="900" height="900"></canvas>
+        <canvas id="radarCanvas"></canvas>
     </div>
 
     <script>
-        // Parse Lobby ID from URL parameter e.g. ?lobby=4GSCOD
+        // Parse Lobby ID & Host IP from URL parameters (e.g. ?lobby=LVE4XI&host=192.168.1.15:8080)
         const urlParams = new URLSearchParams(window.location.search);
         let lobbyId = urlParams.get('lobby') || 'AUTISMO';
         lobbyId = lobbyId.toUpperCase();
         document.getElementById('lobby-id').innerText = lobbyId;
 
+        let customHost = urlParams.get('host') || '';
+        const hostInput = document.getElementById('host-input');
+        if (customHost) {
+            hostInput.value = customHost;
+        } else {
+            hostInput.value = window.location.host || 'localhost:8080';
+        }
+
         // Copy Share Link Button
         document.getElementById('copy-btn').addEventListener('click', () => {
-            navigator.clipboard.writeText(window.location.href).then(() => {
+            const shareUrl = `${window.location.origin}${window.location.pathname}?lobby=${lobbyId}&host=${encodeURIComponent(hostInput.value)}`;
+            navigator.clipboard.writeText(shareUrl).then(() => {
                 const btn = document.getElementById('copy-btn');
                 btn.innerText = 'COPIED!';
                 setTimeout(() => btn.innerText = 'COPY LINK', 2000);
@@ -459,28 +505,30 @@
             opacityValLabel.innerText = Math.round(terrainOpacity * 100) + '%';
         });
 
-        // Setup Canvas
+        // Setup Responsive Canvas
         const canvas = document.getElementById('radarCanvas');
         const ctx = canvas.getContext('2d');
-        const center = { x: canvas.width / 2, y: canvas.height / 2 };
-        const radius = (canvas.width / 2) - 40;
+        const center = { x: 0, y: 0 };
+        let radius = 0;
+
+        function resizeCanvas() {
+            const viewport = document.getElementById('viewport');
+            const size = Math.min(viewport.clientWidth, viewport.clientHeight) - 30;
+            canvas.width = size;
+            canvas.height = size;
+            center.x = canvas.width / 2;
+            center.y = canvas.height / 2;
+            radius = (canvas.width / 2) - 35;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
 
         // Shared Player state & Terrain Map
         let localPlayer = { x: 0, y: 0, z: 0, yaw: 0, name: 'Local' };
         let remotePlayers = {}; // name -> { x, y, z, yaw, isFriend, lastUpdate }
         let mapBlocks = []; // Array of [dx, dz, colorHex]
 
-        // Dual Connection Setup:
-        // 1. Direct Local Embedded Server: ws://localhost:8080/ws (or IP)
-        // 2. Public Internet Broker: wss://broker.emqx.io:8084/mqtt (Fallback for GitHub Pages / Internet sharing)
-        let wsHost = window.location.host;
-        if (!wsHost || window.location.protocol === 'file:' || wsHost.includes('github.io')) {
-            wsHost = 'localhost:8080';
-        }
-        let wsProto = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
-        if (wsHost === 'localhost:8080' || wsHost.startsWith('127.0.0.1')) wsProto = 'ws:';
-        
-        const wsServer = `${wsProto}//${wsHost}/ws`;
+        // WebSocket Receiver Connection Logic
         let ws = null;
         const statusDot = document.getElementById('status-dot');
         const statusText = document.getElementById('status-text');
@@ -494,9 +542,28 @@
             }
         }
 
+        function getTargetWebSocketUrl() {
+            let targetHost = hostInput.value.trim();
+            if (!targetHost || targetHost.includes('github.io')) {
+                targetHost = 'localhost:8080';
+            }
+            let proto = (window.location.protocol === 'https:') ? 'wss:' : 'ws:';
+            if (targetHost.startsWith('localhost') || targetHost.startsWith('127.0.0.1') || targetHost.startsWith('192.168.')) {
+                proto = 'ws:';
+            }
+            return `${proto}//${targetHost}/ws`;
+        }
+
         function connectWebSocket() {
+            if (ws) {
+                try { ws.close(); } catch(e){}
+            }
+
+            const url = getTargetWebSocketUrl();
+            setStatus('disconnected', 'Connecting...');
+
             try {
-                ws = new WebSocket(wsServer);
+                ws = new WebSocket(url);
 
                 ws.onopen = () => {
                     setStatus('connected', 'Connected (Live)');
@@ -541,6 +608,7 @@
             }
         }
 
+        hostInput.addEventListener('change', connectWebSocket);
         connectWebSocket();
 
         // Render Frame Loop (Matching In-Game Radar Visuals)
@@ -554,7 +622,7 @@
 
             if (shapeBoxToggle.checked) {
                 ctx.beginPath();
-                ctx.roundRect(center.x - radius, center.y - radius, radius * 2, radius * 2, 28);
+                ctx.roundRect(center.x - radius, center.y - radius, radius * 2, radius * 2, 32);
                 ctx.fill();
                 ctx.stroke();
             } else {
@@ -575,13 +643,13 @@
                 ctx.globalAlpha = terrainOpacity;
                 ctx.beginPath();
                 if (shapeBoxToggle.checked) {
-                    ctx.roundRect(center.x - radius, center.y - radius, radius * 2, radius * 2, 28);
+                    ctx.roundRect(center.x - radius, center.y - radius, radius * 2, radius * 2, 32);
                 } else {
                     ctx.arc(center.x, center.y, radius, 0, Math.PI * 2);
                 }
                 ctx.clip();
 
-                const blockSize = Math.max(1.8, radarScale * 2.0);
+                const blockSize = Math.max(1.8, radarScale * 2.2);
                 for (let i = 0; i < mapBlocks.length; i++) {
                     const b = mapBlocks[i]; // [dx, dz, colorHex]
                     const dx = b[0];
@@ -612,7 +680,7 @@
                 ctx.beginPath();
                 ctx.moveTo(center.x, center.y);
                 const fovAngle = 70 * Math.PI / 180; // 70° FOV
-                const fovRadius = radius * 0.9;
+                const fovRadius = radius * 0.95;
                 ctx.arc(center.x, center.y, fovRadius, -Math.PI / 2 - fovAngle / 2, -Math.PI / 2 + fovAngle / 2);
                 ctx.closePath();
                 ctx.fill();
@@ -622,11 +690,11 @@
 
             // 4. Draw Distance Rings & Metrics
             if (showRingsToggle.checked) {
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.07)';
                 ctx.lineWidth = 1.2;
                 ctx.setLineDash([4, 4]);
 
-                const ringDistances = [25, 50, 100, 150, 200, 300];
+                const ringDistances = [25, 50, 100, 150, 200, 300, 400, 500];
                 for (let dist of ringDistances) {
                     const r = dist * radarScale;
                     if (r < radius) {
@@ -639,9 +707,9 @@
                         ctx.stroke();
 
                         // Label metric
-                        ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
-                        ctx.font = '600 10px Outfit';
-                        ctx.fillText(dist + 'm', center.x + r - 26, center.y - 4);
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                        ctx.font = '600 11px Outfit';
+                        ctx.fillText(dist + 'm', center.x + r - 28, center.y - 4);
                     }
                 }
                 ctx.setLineDash([]); // Reset line dash
@@ -656,7 +724,7 @@
                     { label: 'W', dx: -1, dz: 0 }
                 ];
 
-                ctx.font = '800 13px Outfit';
+                ctx.font = '800 14px Outfit';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
@@ -664,12 +732,12 @@
                     let px = d.dx * c + d.dz * s;
                     let py = -d.dx * s + d.dz * c;
 
-                    let labelDist = radius + 18;
+                    let labelDist = radius + 20;
                     if (shapeBoxToggle.checked) {
                         const scaleFactor = 1.0 / Math.max(Math.abs(px), Math.abs(py));
                         px *= scaleFactor;
                         py *= scaleFactor;
-                        labelDist = radius + 20;
+                        labelDist = radius + 22;
                     }
 
                     const tx = center.x + px * labelDist;
@@ -707,7 +775,7 @@
 
                 let outOfBounds = false;
                 if (shapeBoxToggle.checked) {
-                    const limit = radius - 12;
+                    const limit = radius - 14;
                     if (Math.abs(px) > limit || Math.abs(py) > limit) {
                         outOfBounds = true;
                         px = Math.max(-limit, Math.min(limit, px));
@@ -715,11 +783,11 @@
                     }
                 } else {
                     const dist = Math.sqrt(px * px + py * py);
-                    if (dist > radius - 12) {
+                    if (dist > radius - 14) {
                         outOfBounds = true;
                         const angle = Math.atan2(py, px);
-                        px = (radius - 12) * Math.cos(angle);
-                        py = (radius - 12) * Math.sin(angle);
+                        px = (radius - 14) * Math.cos(angle);
+                        py = (radius - 14) * Math.sin(angle);
                     }
                 }
 
@@ -763,7 +831,7 @@
 
                     ctx.font = '600 11px Outfit';
                     ctx.textAlign = 'center';
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
                     const tw = ctx.measureText(tagText).width;
                     ctx.fillRect(drawX - tw / 2 - 4, drawY - 24, tw + 8, 14);
 
@@ -780,13 +848,13 @@
                 // Local Player Direction Triangle Pointer
                 ctx.fillStyle = '#ccff00';
                 ctx.shadowColor = '#ccff00';
-                ctx.shadowBlur = 12;
+                ctx.shadowBlur = 14;
 
                 ctx.beginPath();
-                ctx.moveTo(0, -10); // Tip
-                ctx.lineTo(-7, 8);  // Left wing
+                ctx.moveTo(0, -12); // Tip
+                ctx.lineTo(-8, 9);  // Left wing
                 ctx.lineTo(0, 4);   // Inner notch
-                ctx.lineTo(7, 8);   // Right wing
+                ctx.lineTo(8, 9);   // Right wing
                 ctx.closePath();
                 ctx.fill();
 
